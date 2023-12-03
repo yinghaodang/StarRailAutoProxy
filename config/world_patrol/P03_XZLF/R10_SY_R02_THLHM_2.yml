@@ -6,24 +6,44 @@ tp: '谈狐林后门'
 route:
   - op: 'move'
     data: [234, 549]
-  - op: 'move'
+  - op: 'slow_move'
+    data: [254, 551]
+  - op: 'patrol'
+  - op: 'slow_move'
     data: [234, 567]
   - op: 'patrol'
-  - op: 'move'
+  - op: 'slow_move'
     data: [241, 597]
   - op: 'move'
     data: [266, 649]
-  - op: 'move'
+  - op: 'slow_move'
+    data: [272, 677]
+  - op: 'slow_move'
     data: [290, 700]
   - op: 'move'
     data: [316, 758]
+  - op: 'slow_move'
+    data: [292, 767]
+  - op: 'slow_move'
+    data: [278, 743]
+  - op: 'slow_move'
+    data: [255, 746]
+  - op: 'patrol'
+  - op: 'slow_move'
+    data: [231, 764]
+  - op: 'slow_move'
+    data: [214, 786]
   - op: 'move'
-    data: [351, 760]
+    data: [206, 836]
   - op: 'move'
-    data: [380, 802]
+    data: [237, 872]
+  - op: 'move'
+    data: [300, 864]
   - op: 'patrol'
   - op: 'move'
-    data: [368, 841]
+    data: [359, 861]
   - op: 'move'
-    data: [360, 860]
+    data: [380, 817]
+  - op: 'slow_move'
+    data: [375, 793]
   - op: 'patrol'

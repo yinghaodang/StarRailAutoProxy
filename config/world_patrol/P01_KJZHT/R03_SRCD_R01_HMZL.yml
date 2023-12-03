@@ -6,7 +6,7 @@ tp: '毁灭之蕾拟造花萼赤'
 route:
   - op: 'move'
     data: [318, 445, -1]
-  - op: 'move'
+  - op: 'slow_move'
     data: [257, 445]
   - op: 'move'
     data: [257, 325]

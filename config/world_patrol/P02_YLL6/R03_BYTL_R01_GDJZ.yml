@@ -25,7 +25,10 @@ route:
     data: [746, 680]
   - op: 'patrol'
   - op: 'move'
-    data: [746, 835]
+    data: [747, 717]
+  - op: 'patrol'
+  - op: 'move'
+    data: [746, 788]
   - op: 'patrol'
   - op: 'move'
     data: [686, 851]

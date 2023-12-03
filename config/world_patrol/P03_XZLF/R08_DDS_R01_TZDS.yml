@@ -11,16 +11,17 @@ route:
   - op: 'move'
     data: [465, 596]
   - op: 'move'
-    data: [455, 606]
+    data: [454, 582]
   - op: 'move'
     data: [441, 597]
   - op: 'move'
     data: [390, 596]
   - op: 'move'
-    data: [346, 557]
+    data: [362, 557]
   - op: 'patrol'
   - op: 'move'
-    data: [323, 559]
+    data: [333, 524]
+  - op: 'patrol'
   - op: 'move'
     data: [317, 527]
   - op: 'move'

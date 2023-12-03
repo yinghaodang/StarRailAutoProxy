@@ -3,6 +3,7 @@ from typing import List
 import flet as ft
 
 from basic.i18_utils import gt
+from basic.config_utils import clear_config_file
 from gui.sr_app_view import SrAppView
 from sr.app.world_patrol import WorldPatrolWhitelist, load_all_whitelist_id
 from sr.app.world_patrol.world_patrol_app import WorldPatrol
@@ -23,6 +24,7 @@ class WorldPatrolRunView(SrAppView):
         self.diy_part.content = ft.Column(spacing=5, controls=[
             ft.Container(content=settings_text),
             ft.Container(content=self.whitelist_dropdown),
+            ft.ElevatedButton(text="清除锄大地记录", on_click=self.clean_world_patrol_record)
         ])
 
     def on_rail_chosen(self, e):
@@ -37,6 +39,9 @@ class WorldPatrolRunView(SrAppView):
             options.append(opt)
         self.whitelist_dropdown.options = options
 
+    def clean_world_patrol_record(self, e):
+        clear_config_file(name="world_patrol", sub_dir=["app_run_record"])
+        
     def run_app(self):
         whitelist: WorldPatrolWhitelist = None
         if self.whitelist_dropdown.value is not None and self.whitelist_dropdown.value != 'none':

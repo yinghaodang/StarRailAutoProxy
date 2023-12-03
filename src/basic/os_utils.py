@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import warnings
 
 
 def join_dir_path_with_mk(path: str, *subs) -> str:
@@ -16,6 +17,7 @@ def join_dir_path_with_mk(path: str, *subs) -> str:
         target_path = os.path.join(target_path, sub)
         if not os.path.exists(target_path):
             os.mkdir(target_path)
+            warnings.warn("创建了文件夹{}, 请确认理解此步操作。".format(target_path), UserWarning)
     return target_path
 
 

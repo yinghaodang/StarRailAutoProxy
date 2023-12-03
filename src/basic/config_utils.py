@@ -1,7 +1,7 @@
 import os
 from ctypes import Union
 from typing import List
-
+from basic.log_utils import log
 import yaml
 
 from basic import os_utils
@@ -43,9 +43,12 @@ def read_config(name: str, sample: bool = True, sub_dir: List[str] = None):
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as file:
             data = yaml.safe_load(file)
+        return data
     if data is None and sample:
         data = read_sample_config(name, sub_dir=sub_dir)
-    return data
+        return data
+    else:
+        log.warning('找不到配置文件 %s' % path)
 
 
 def read_sample_config(name: str, sub_dir: List[str] = None):
@@ -125,3 +128,17 @@ def async_sample(name: str, sub_dir: List[str] = None) -> dict:
     save_config(name, config)
     return config
 
+def clear_config_file(name: str, sub_dir: List[str] = None):
+    """
+    清空文件内容
+    :param name: 文件名称,不带后缀
+    :param sub_dir: 子目录
+    :return:
+    """
+    path = get_config_file_path(name, sub_dir=sub_dir)
+    if os.path.exists(path):
+        with open(path, 'w') as f:
+            f.truncate()
+            log.warning('文件 %s 已清空' % path)
+    else:
+        log.warning('文件 %s 不存在' % path)

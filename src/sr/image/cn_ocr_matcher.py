@@ -1,16 +1,13 @@
-import logging
 from typing import Optional
-
 from cv2.typing import MatLike
 from paddleocr import PaddleOCR
 
 from basic import os_utils
+from basic.log_utils import log
 from basic.img import MatchResultList, MatchResult
-from basic.i18_utils import gt
+# from basic.i18_utils import gt
 
 from sr.image.ocr_matcher import OcrMatcher, merge_ocr_result_to_single_line
-
-logging.getLogger().handlers.clear()  # 不知道为什么 这里会引入这个logger 清除掉避免console中有重复日志
 
 
 class CnOcrMatcher(OcrMatcher):
@@ -123,11 +120,11 @@ if __name__ == "__main__":
     import cv2
     cnocr_matcher = CnOcrMatcher()
     img_path = r'C:\Users\yinghaodang\projects\StarRailAutoProxy-yhd\.debug\images\choose_2023-12-18_03-02-22.png'  # 测试图片路径
-    # img_path = r"C:\Users\yinghaodang\projects\StarRailAutoProxy-yhd\.debug\images\screen_map_2023-12-18_03-02-17.png"
+
     img = cv2.imread(img_path)
 
     # from basic.img.os import save_debug_image
     # save_debug_image(img, prefix="ocr")
     # print(cnocr_matcher.ocr_for_single_line(img, strict_one_line=False))
-    print(cnocr_matcher.run_ocr(img))
+    # print(cnocr_matcher.run_ocr(img))
     # print(cnocr_matcher.run_ocr_without_det(img))

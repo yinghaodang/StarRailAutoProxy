@@ -154,7 +154,7 @@ class GameConfig(ConfigHolder):
         if proxy_type == game_config_const.PROXY_TYPE_NONE.id:
             return None
         elif proxy_type == game_config_const.PROXY_TYPE_GHPROXY.id:
-            return 'https://gh-proxy.com/'
+            return game_config_const.GH_PROXY_URL
         elif proxy_type == game_config_const.PROXY_TYPE_PERSONAL.id:
             proxy = self.personal_proxy
             return None if proxy == '' else proxy
@@ -191,6 +191,38 @@ class GameConfig(ConfigHolder):
         :return:
         """
         self.update('key_technique', new_value)
+
+    @property
+    def key_open_map(self) -> str:
+        """
+        秘技按钮
+        :return:
+        """
+        return self.get('key_open_map', 'm')
+
+    @key_open_map.setter
+    def key_open_map(self, new_value):
+        """
+        更新秘技按钮
+        :return:
+        """
+        self.update('key_open_map', new_value)
+
+    @property
+    def key_esc(self) -> str:
+        """
+        秘技按钮
+        :return:
+        """
+        return self.get('key_esc', 'esc')
+
+    @key_esc.setter
+    def key_esc(self, new_value):
+        """
+        更新秘技按钮
+        :return:
+        """
+        self.update('key_esc', new_value)
 
 
 _gc = None

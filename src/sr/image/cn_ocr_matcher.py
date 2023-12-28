@@ -120,7 +120,6 @@ if __name__ == "__main__":
     import cv2
     cnocr_matcher = CnOcrMatcher()
     img_path = r'C:\Users\yinghaodang\projects\StarRailAutoProxy-yhd\.debug\images\choose_2023-12-18_03-02-22.png'  # 测试图片路径
-
     img = cv2.imread(img_path)
 
     # from basic.img.os import save_debug_image

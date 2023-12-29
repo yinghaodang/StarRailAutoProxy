@@ -7,12 +7,12 @@ from basic import cal_utils, Point
 from basic.img import cv2_utils
 from basic.img.os import get_test_image_dir
 from basic.log_utils import log
-from sr import const, cal_pos, performance_recorder
+from sr import cal_pos, performance_recorder
 from sr.const import map_const
 from sr.const.map_const import Region
 from sr.image.cv2_matcher import CvImageMatcher
 from sr.image.image_holder import ImageHolder
-from sr.image.sceenshot import LargeMapInfo, mini_map, large_map, mini_map_angle_alas
+from sr.image.sceenshot import LargeMapInfo, mini_map, mini_map_angle_alas
 from sr.image.sceenshot.large_map import get_large_map_rect_by_pos
 
 
@@ -42,7 +42,11 @@ case_list = [
 
     TestCase(map_const.P01_R04_L1, Point(483, 276), 1, True),
 
-    TestCase(map_const.P02_R05, Point(495, 429), 1, True),
+    TestCase(map_const.P01_R05_L2, Point(381, 669), 1, True, possible_pos=(386, 678, 25)),
+    TestCase(map_const.P01_R05_L2, Point(332, 525), 2, True, possible_pos=(302, 554, 25)),
+    TestCase(map_const.P01_R05_L2, Point(332, 525), 3, True, possible_pos=(298, 530, 60)),
+
+    TestCase(map_const.P02_R05, Point(497, 440), 1, True),
     TestCase(map_const.P02_R05, Point(242, 1283), 2, True),
     TestCase(map_const.P02_R05, Point(488, 1147), 3, False, possible_pos=(488, 1155, 0)),
     TestCase(map_const.P02_R05, Point(365, 1176), 4, True, possible_pos=(390, 1176, 52)),
@@ -61,7 +65,7 @@ case_list = [
 
     TestCase(map_const.P03_R09, Point(972, 402), 1, True, (963, 360, 30)),
 
-    TestCase(map_const.P03_R10, Point(375, 788), 1, True, (400, 744, 29)),
+    TestCase(map_const.P03_R10, Point(378, 806), 1, True, (400, 784, 29)),
 ]
 
 
@@ -102,7 +106,7 @@ if __name__ == '__main__':
     fail_list = []
     for i in range(len(case_list)):
         c: TestCase = case_list[i]
-        # if c.region != map_const.P02_R11_L1 or c.num != 4:
+        # if c.region != map_const.P03_R10 or c.num != 1:
         #     continue
         if c.region.prl_id not in lm_info_map:
             lm_info_map[c.region.prl_id] = ih.get_large_map(c.region)

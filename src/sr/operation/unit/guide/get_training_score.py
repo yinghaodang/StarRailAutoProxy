@@ -11,7 +11,7 @@ from sr.operation import Operation, OperationOneRoundResult
 
 class GetTrainingScore(Operation):
 
-    SCORE_RECT: ClassVar[Rect] = Rect(320, 345, 370, 370)
+    SCORE_RECT: ClassVar[Rect] = Rect(315, 345, 375, 370)
 
     def __init__(self, ctx: Context, score_callback: Optional[Callable] = None):
         """
@@ -33,7 +33,7 @@ class GetTrainingScore(Operation):
         score = self._get_score()
 
         if score is None:
-            return Operation.round_retry('识别不到数字')
+            return Operation.round_retry('识别不到数字', 1)
         else:
             if self.score_callback is not None:
                 self.score_callback(score)
@@ -54,6 +54,9 @@ class GetTrainingScore(Operation):
         for i in range(1, 6):  # 优先判断1-5数字是否有出现
             if ocr_result.find(str(i)) != -1:
                 return i * 100
+
+        # 特殊处理 将出现的字母O转化成0
+        ocr_result = ocr_result.replace('o', '0').replace('O', '0')
 
         if str_utils.get_positive_digits(ocr_result, None) is None:
             return None

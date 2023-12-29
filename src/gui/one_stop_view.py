@@ -187,9 +187,8 @@ class AppList(ft.ListView):
 
 class OneStopView(ft.Row, SrBasicView):
 
-    def __init__(self, ctx: Context):
-        self.ctx: Context = ctx
-        theme: ThemeColors = gui_config.theme()
+    def __init__(self, page: ft.Page, ctx: Context):
+        SrBasicView.__init__(self, page, ctx)
 
         self.update_time = Label2NormalValueRow('数据更新时间', '2023-11-09 00:00:00', width=info_text_width*2)
         self.power = Label2NormalValueRow('开拓力', '200/240')
@@ -242,8 +241,8 @@ class OneStopView(ft.Row, SrBasicView):
         self.next_job = Label2NormalValueRow('下一个', '无')
         status_content_row = ft.Row(controls=[self.running_status, self.next_job])
 
-        self.shutdown_check = ft.Checkbox(label=gt("结束后关机", model='ui'), value=False, on_change=self.on_shutdown_changed)
-        shutdown_row = ft.Row(controls=[self.shutdown_check], alignment=ft.MainAxisAlignment.CENTER)
+        self.after_done_dropdown = components.AfterDone(self._on_after_done_changed)
+        after_done_row = ft.Row(controls=[self.after_done_dropdown], alignment=ft.MainAxisAlignment.CENTER)
 
         self.start_btn = components.RectOutlinedButton(text="F9 开始", on_click=self.on_click_start)
         self.pause_btn = components.RectOutlinedButton(text="F9 暂停", on_click=self.on_click_pause, visible=False)
@@ -252,9 +251,9 @@ class OneStopView(ft.Row, SrBasicView):
         ctrl_btn_row = ft.Row(controls=[self.start_btn, self.pause_btn, self.resume_btn, self.stop_btn],
                               alignment=ft.MainAxisAlignment.CENTER)
 
-        status_content = ft.Column(controls=[status_content_row, shutdown_row, ctrl_btn_row], auto_scroll=True)
+        status_content = ft.Column(controls=[status_content_row, after_done_row, ctrl_btn_row], auto_scroll=True)
 
-        status_card = components.Card(status_content, title=status_title_row, width=info_card_width, height=150)
+        status_card = components.Card(status_content, title=status_title_row, width=info_card_width, height=180)
 
         left_part = ft.Container(ft.Column(controls=[character_info_card, status_card], spacing=10))
 
@@ -271,7 +270,7 @@ class OneStopView(ft.Row, SrBasicView):
         self._update_app_list_status()
         self._update_character_status()
         scheduler.every_second(self._update_app_list_status, tag='_update_app_list_status')
-        self.ctx.register_status_changed_handler(self,
+        self.sr_ctx.register_status_changed_handler(self,
                                                  self._after_start,
                                                  self._after_pause,
                                                  self._after_resume,
@@ -281,14 +280,14 @@ class OneStopView(ft.Row, SrBasicView):
     def handle_after_hide(self):
         scheduler.cancel_with_tag('_update_app_list_status')
         scheduler.cancel_with_tag('_update_running_app_name')
-        self.ctx.unregister(self)
+        self.sr_ctx.unregister(self)
 
     def _check_ctx_stop(self) -> bool:
         """
         检查是否在停止状态
         :return: 是否在停止状态
         """
-        if not self.ctx.is_stop:
+        if not self.sr_ctx.is_stop:
             msg: str = '其它任务正在执行 请先完成或停止'
             snack_bar.show_message(msg, self.page)
             log.info(msg)
@@ -301,7 +300,7 @@ class OneStopView(ft.Row, SrBasicView):
 
         run_record = one_stop_service.get_app_run_record_by_id(app_id)
         run_record.check_and_update_status()
-        self.running_app = one_stop_service.get_app_by_id(app_id, self.ctx)
+        self.running_app = one_stop_service.get_app_by_id(app_id, self.sr_ctx)
         if self.running_app is None:
             log.error('非法的任务入参')
             self.running_app = None
@@ -315,32 +314,32 @@ class OneStopView(ft.Row, SrBasicView):
             return
         self.start_btn.disabled = True
         self.update()
-        self.running_app = OneStopService(self.ctx)
+        self.running_app = OneStopService(self.sr_ctx)
 
         t = threading.Thread(target=self.running_app.execute)
         t.start()
 
     def on_click_pause(self, e):
-        self.ctx.switch()
+        self.sr_ctx.switch()
 
     def on_click_resume(self, e):
-        self.ctx.switch()
+        self.sr_ctx.switch()
 
     def on_click_stop(self, e):
-        self.ctx.stop_running()
+        self.sr_ctx.stop_running()
 
     def _update_status_component(self):
         """
         更新显示状态相关的组件
         :return:
         """
-        self.start_btn.visible = self.ctx.is_stop
+        self.start_btn.visible = self.sr_ctx.is_stop
         self.start_btn.disabled = False
-        self.pause_btn.visible = self.ctx.is_running
-        self.resume_btn.visible = self.ctx.is_pause
-        self.stop_btn.disabled = self.ctx.is_stop
-        self.running_ring.visible = self.ctx.is_running
-        self.running_status.update_label(self.ctx.status_text)
+        self.pause_btn.visible = self.sr_ctx.is_running
+        self.resume_btn.visible = self.sr_ctx.is_pause
+        self.stop_btn.disabled = self.sr_ctx.is_stop
+        self.running_ring.visible = self.sr_ctx.is_running
+        self.running_status.update_label(self.sr_ctx.status_text)
         self.update()
 
     def _after_start(self):
@@ -360,12 +359,17 @@ class OneStopView(ft.Row, SrBasicView):
         scheduler.cancel_with_tag('_update_running_app_name')
         self.running_app = None
         self._update_running_app_name()
-        if self.shutdown_check.value:
+
+        if self.after_done_dropdown.value == 'shutdown':
             log.info('执行完毕 准备关机')
             win_utils.shutdown_sys(60)
+        elif self.after_done_dropdown.value == 'close':
+            log.info('执行完毕 关闭游戏')
+            if self.sr_ctx.controller is not None:
+                self.sr_ctx.controller.close_game()
 
-    def on_shutdown_changed(self, e):
-        if not self.shutdown_check.value:
+    def _on_after_done_changed(self, e):
+        if self.after_done_dropdown.value != 'shutdown':
             log.info('已取消关机计划')
             win_utils.cancel_shutdown_sys()
 
@@ -435,8 +439,8 @@ class OneStopView(ft.Row, SrBasicView):
 osv: OneStopView = None
 
 
-def get(ctx: Context):
+def get(page: ft.Page, ctx: Context):
     global osv
     if osv is None:
-        osv = OneStopView(ctx)
+        osv = OneStopView(page, ctx)
     return osv

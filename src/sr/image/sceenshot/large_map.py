@@ -187,8 +187,8 @@ def get_active_floor(screen: MatLike, ocr: OcrMatcher) -> str:
     :param ocr: ocr
     :return: 当前选择区域
     """
-    lower = 40
-    upper = 80
+    lower = 0
+    upper = 90
     part, _ = cv2_utils.crop_image(screen, FLOOR_LIST_PART)
     bw = cv2.inRange(part, (lower, lower, lower), (upper, upper, upper))
     km = ocr.run_ocr(bw)
@@ -403,7 +403,7 @@ def get_large_map_rect_by_pos(lm_shape, mm_shape, possible_pos: tuple = None) ->
         x, y = int(possible_pos[0]), int(possible_pos[1])
         # 还没有移动的话 通常是第一个点 这时候先默认移动1秒距离判断
         r = 20 if len(possible_pos) < 3 or possible_pos[2] == 0 else int(possible_pos[2])
-        ur = r + 20 + mr + 5  # 潜在位置半径 = 移动距离 + 20(1秒移动距离) + 小地图半径 + 5(多留一些边缘匹配)
+        ur = r + mr + 5  # 潜在位置半径 = 移动距离 + 20(1秒移动距离) + 小地图半径 + 5(多留一些边缘匹配)
         lm_offset_x = x - ur
         lm_offset_y = y - ur
         lm_offset_x2 = x + ur

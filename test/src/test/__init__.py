@@ -2,7 +2,6 @@ import os
 from typing import List
 
 from cv2.typing import MatLike
-from pydantic import BaseModel
 
 from basic import os_utils
 from basic.img import cv2_utils
@@ -14,6 +13,8 @@ class SrTestBase:
     """测试资源所在目录"""
 
     def __init__(self, file):
+        os.environ['DEBUG'] = '1'
+
         # 获取本基类的路径
         base_file_path = os.path.abspath(__file__)
         # 获取本基类所在的包路径

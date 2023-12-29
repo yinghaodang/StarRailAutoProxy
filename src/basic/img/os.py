@@ -1,6 +1,6 @@
 import os
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import cv2
 from cv2.typing import MatLike
@@ -47,11 +47,8 @@ def get_test_image(filename, suffix: str = '.png', sub_dir: str = None) -> MatLi
 def save_debug_image(image, prefix: str = '') -> str:
 
     dt_object = datetime.fromtimestamp(time.time())
-    time_difference = timedelta(hours=8)  # 增加8个小时的时间差
-    new_dt_object = dt_object + time_difference
 
-    # 将新的 datetime 对象格式化为特定格式
-    formatted_time = new_dt_object.strftime('%Y-%m-%d_%H-%M-%S')
+    formatted_time = dt_object.strftime('%Y-%m-%d_%H-%M-%S')
     file_name = '{}_{}'.format(prefix, formatted_time)
     path = get_debug_image_path(file_name)
     log.debug('临时图片保存 %s', path)

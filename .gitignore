@@ -26,3 +26,4 @@ config/forgotten_hall.yml
 test*.png
 test*.jpg
 src/test_images/
+test*.py

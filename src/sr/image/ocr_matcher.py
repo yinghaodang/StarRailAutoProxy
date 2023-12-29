@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from cv2.typing import MatLike
 
@@ -14,7 +14,7 @@ class OcrMatcher:
         识别单行文本
         :param image: 图片
         :param threshold: 阈值
-        :param strict_one_line: 是否严格单行 非严格情况下会
+        :param strict_one_line: True时认为当前只有单行文本 False时依赖程序合并成一行
         :return:
         """
         pass
@@ -65,6 +65,44 @@ class OcrMatcher:
                             match_key.add(k)
 
         return {key: all_match_result[key] for key in match_key if key in all_match_result}
+    
+    def run_ocr_without_det(self, image: MatLike, threshold: float = None) -> str:
+        """
+        单文字OCR
+        :param image: 图片
+        :param threshold: 匹配阈值
+        :return: [("text", "score"),]
+        """
+        pass
+
+    def match_one_best_word(self, image: MatLike, word: str, lcs_percent: Optional[float] = None) -> Optional[MatchResult]:
+        """
+        匹配一个文本 只返回一个最佳的结果
+        适合在目标文本只会出现一次的场景下使用
+        :param image: 图片
+        :param word: 关键词
+        :param lcs_percent: 所需的最低LCS阈值
+        :return:
+        """
+        ocr_map = self.run_ocr(image)
+
+        target_result: Optional[MatchResult] = None
+        target_lcs_percent: Optional[float] = None
+
+        word_to_find = gt(word, 'ocr')
+
+        for word, match_result_list in ocr_map.items():
+            current_lcs = str_utils.longest_common_subsequence_length(word_to_find, word)
+            current_lcs_percent = current_lcs / len(word_to_find)
+
+            if lcs_percent is not None and current_lcs_percent < lcs_percent:  # 不满足最低阈值
+                continue
+
+            if target_result is None or target_lcs_percent is None or target_lcs_percent < current_lcs_percent:
+                target_result = match_result_list.max
+                target_lcs_percent = current_lcs_percent
+
+        return target_result
     
     def run_ocr_without_det(self, image: MatLike, threshold: float = None) -> str:
         """

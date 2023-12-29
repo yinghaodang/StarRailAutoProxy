@@ -1,10 +1,9 @@
 import time
-from typing import Callable, Union, ClassVar, Optional, List
+from typing import Callable, ClassVar, Optional, List
 
 import cv2
 import numpy as np
 from cv2.typing import MatLike
-from pydantic import BaseModel
 
 from basic import Rect
 from basic.i18_utils import gt
@@ -15,20 +14,22 @@ from sr.const.character_const import CharacterCombatType, CHARACTER_COMBAT_TYPE_
 from sr.context import Context, get_context
 from sr.operation import Operation, OperationOneRoundResult
 from sr.operation.combine import CombineOperation
-from sr.operation.unit.click import Click
+from sr.operation.unit.click import ClickPoint
 from sr.operation.unit.forgotten_hall.choose_character import ChooseCharacterInForgottenHall
 
 
-class SessionInfo(BaseModel):  # 关卡的信息
+class SessionInfo:  # 关卡的信息
 
-    num: int
-    """关卡编码"""
+    def __init__(self, num: int, combat_type_rect_list: List[Rect], character_rect_list: List[Rect]):
 
-    combat_type_rect_list: List[Rect]
-    """属性框"""
+        self.num: int = num
+        """关卡编码"""
 
-    character_rect_list: List[Rect]
-    """角色框"""
+        self.combat_type_rect_list: List[Rect] = combat_type_rect_list
+        """属性框"""
+
+        self.character_rect_list: List[Rect] = character_rect_list
+        """角色框"""
 
 
 class ChooseTeamInForgottenHall(Operation):
@@ -65,16 +66,19 @@ class ChooseTeamInForgottenHall(Operation):
 
     ALL_SESSION_LIST: ClassVar[List[SessionInfo]] = [SESSION_1, SESSION_2]
 
-    def __init__(self, ctx: Context, cal_team_member_func: Callable):
+    def __init__(self, ctx: Context, cal_team_member_func: Callable,
+                 choose_team_callback: Optional[Callable[[List[List[Character]]], None]] = None):
         """
         需要已经在
         :param ctx:
         :param cal_team_member_func:
+        :param choose_team_callback: 计算得到配队后的回调
         """
         super().__init__(ctx, op_name=gt('忘却之庭 选择配队', 'ui'))
         self.cal_team_func: Callable = cal_team_member_func
         self.phase: int = 0
         self.teams: List[List[Character]] = []
+        self.choose_team_callback: Optional[Callable[[List[List[Character]]], None]] = choose_team_callback
 
     def _execute_one_round(self) -> OperationOneRoundResult:
         if self.phase == 0:  # 按照BOSS属性计算配队
@@ -113,6 +117,9 @@ class ChooseTeamInForgottenHall(Operation):
         for t in self.teams:
             if t is None:
                 return False
+
+        if self.choose_team_callback is not None:
+            self.choose_team_callback(self.teams)
 
         return True
 
@@ -193,7 +200,7 @@ class ChooseTeamInForgottenHall(Operation):
         for session in ChooseTeamInForgottenHall.ALL_SESSION_LIST:
             idx += 1
             team = self.teams[idx]
-            ops.append(Click(self.ctx, session.character_rect_list[0].center))
+            ops.append(ClickPoint(self.ctx, session.character_rect_list[0].center))
             for character in team:
                 ops.append(ChooseCharacterInForgottenHall(self.ctx, character.id))
         op = CombineOperation(

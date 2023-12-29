@@ -1,7 +1,5 @@
 import time
 
-from pydantic import BaseModel
-
 from basic import Point
 from basic.i18_utils import gt
 from sr.context import Context
@@ -9,15 +7,16 @@ from sr.image.sceenshot import secondary_ui
 from sr.operation import Operation, OperationOneRoundResult
 
 
-class InventoryCategory(BaseModel):
-    """背包类目"""
+class InventoryCategory:
+    def __init__(self, template_id: str, cn: str, pos: Point):
+        """背包类目"""
 
-    template_id: str
-    """模板ID"""
-    cn: str
-    """类目名称"""
-    pos: Point
-    """位置"""
+        self.template_id: str = template_id
+        """模板ID"""
+        self.cn: str = cn
+        """类目名称"""
+        self.pos: Point = pos
+        """位置"""
 
 
 INVENTORY_CATEGORY_UPGRADE_MATERIALS = InventoryCategory(template_id='upgrade_materials', cn='养成材料', pos=Point(636, 60))
@@ -45,7 +44,7 @@ class ChooseInventoryCategory(Operation):
 
     def _execute_one_round(self) -> OperationOneRoundResult:
         screen = self.screenshot()
-        if not secondary_ui.in_secondary_ui(screen, self.ctx.ocr, title_cn=secondary_ui.TITLE_INVENTORY):
+        if not secondary_ui.in_secondary_ui(screen, self.ctx.ocr, title_cn=secondary_ui.TITLE_INVENTORY.cn):
             time.sleep(1)
             return Operation.round_retry('未在背包页面')
 

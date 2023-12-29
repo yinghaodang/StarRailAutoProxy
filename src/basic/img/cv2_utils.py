@@ -679,6 +679,9 @@ def show_image_ipython(img: MatLike,
         elif type(rects) == MatchResultList:
             for i in rects:
                 cv2.rectangle(to_show, (i.x, i.y), (i.x + i.w, i.y + i.h), (255, 255, 255), 1)
+    
+    if to_show.dtype != np.uint8:
+        to_show = to_show.astype(np.uint8)
 
     opencv_image_rgb = cv2.cvtColor(to_show, cv2.COLOR_BGR2RGB)
     return Image.fromarray(opencv_image_rgb)

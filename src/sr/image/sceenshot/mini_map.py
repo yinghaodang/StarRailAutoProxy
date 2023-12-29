@@ -70,7 +70,7 @@ def extract_arrow(mini_map: MatLike):
     return cv2_utils.color_similarity_2d(mini_map, const.COLOR_ARROW_BGR)
 
 
-def get_arrow_mask(mm: MatLike):
+def get_arrow_mask(mm: MatLike): # 不清楚这个函数的细节
     """
     获取小地图的小箭头掩码
     :param mm: 小地图
@@ -80,9 +80,9 @@ def get_arrow_mask(mm: MatLike):
     cx, cy = w // 2, h // 2
     d = const.TEMPLATE_ARROW_LEN
     r = const.TEMPLATE_ARROW_R
-    center = mm[cy - r:cy + r, cx - r:cx + r]
-    arrow = extract_arrow(center)
-    _, mask = cv2.threshold(arrow, 180, 255, cv2.THRESH_BINARY)
+    center = mm[cy - r:cy + r, cx - r:cx + r]              # 中心区域
+    arrow = extract_arrow(center)                          # 这一步已经提取得差不多了
+    _, mask = cv2.threshold(arrow, 180, 255, cv2.THRESH_BINARY)      # 二值化
     # 做一个连通性检测 小于50个连通的认为是噪点
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
     large_components = []
@@ -97,7 +97,7 @@ def get_arrow_mask(mm: MatLike):
     # 黑色边缘线条采集不到 稍微膨胀一下
     kernel = np.ones((5, 5), np.uint8)
     cv2.dilate(src=whole_mask, dst=whole_mask, kernel=kernel, iterations=1)
-    arrow_mask, _ = cv2_utils.convert_to_standard(mask, mask, width=d, height=d)
+    arrow_mask, _ = cv2_utils.convert_to_standard(mask, mask, width=d, height=d) # 这一步不知道干啥的
     return arrow_mask, whole_mask
 
 

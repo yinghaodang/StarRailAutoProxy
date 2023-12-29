@@ -24,3 +24,5 @@ config/forgotten_hall.yml
 .virtual_documents/
 *.ipynb
 test*.png
+test*.jpg
+src/test_images/

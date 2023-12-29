@@ -163,5 +163,5 @@ if __name__ == '__main__':
     ctx.controller.init()
     ctx.running = 1
     P02 = map_const.P02
-    app = RunPatrolRoute(ctx=ctx, route_id=WorldPatrolRouteId(P02, "R12_JXJL_R01_TXZL"))
+    app = RunPatrolRoute(ctx=ctx, route_id=WorldPatrolRouteId(P02, "R12_JXJL_R01_TXZL"))  # 此处ID是路线文件夹名称
     app.execute()

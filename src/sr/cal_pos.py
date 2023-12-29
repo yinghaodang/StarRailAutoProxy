@@ -459,7 +459,7 @@ def template_match_with_scale_list_parallely(im: ImageMatcher,
         except concurrent.futures.TimeoutError:
             log.error('模板匹配超时', exc_info=True)
 
-    return target;
+    return target
 
 
 def template_match_with_scale(im: ImageMatcher,

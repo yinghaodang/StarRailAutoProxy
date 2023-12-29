@@ -61,6 +61,31 @@ def convolve(arr, kernel=3):
     return sum(np.roll(arr, i) * (kernel - abs(i)) // kernel for i in range(-kernel + 1, kernel))
 
 
+def get_3th_top_peaks(y_axis: np.ndarray, signal_func):
+    """
+    获取第三高的峰对应的y轴坐标, len(lst)>3
+    :param y_axis: find_peak返回的y轴坐标
+    """
+    # 初始化三个变量来存储第一大、第二大和第三大的值
+    first = second = third = float('-inf')
+    peak_lst = [signal_func(y) for y in y_axis]
+    
+    # 遍历数组找出第一大、第二大和第三大的值
+    for peak in peak_lst:
+        if peak > first:
+            third = second
+            second = first
+            first = peak
+        elif second < peak < first:
+            third = second
+            second = peak
+        elif third < peak < second:
+            third = peak
+            
+    # 如果找到了第三大的值则返回它，否则返回第一大的值
+    return third
+
+
 def calculate(minimap: MatLike, scale: int = 1):
     """
     计算小地图上角色的朝向 参考自 ALAZ
@@ -134,3 +159,39 @@ def calculate(minimap: MatLike, scale: int = 1):
         degree += 360
 
     return degree
+
+
+def calculate_angle(minimap: MatLike, scale: int = 1):
+    """
+    minimap: MatLike 小地图图片
+    scale: int 出于兼容性考虑
+    相比于alas的版本, 更容易理解, 准确率和效率有待测试
+    """
+    d = minimap.shape[0]
+    
+    _, _, v = cv2.split(cv2.cvtColor(minimap, cv2.COLOR_BGR2YUV))
+    image = cv2.subtract(128, v)
+    
+    # 这样峰值对应的横坐标即为原图中 离圆心的远端 距离正东边的角度
+    # 先验知识可知，原图中应有三个峰，且对应箭头朝向的为其中最小值，另外两个峰值几乎相等
+    remap = cv2.warpPolar(src = image,
+                          dst = None,
+                          dsize = (d,360),  # 360是一周的角度
+                          center = (d/2,d/2),
+                          maxRadius = d/2,
+                          flags = cv2.INTER_LINEAR)
+    threshold_value = 70
+    _, binary_image = cv2.threshold(remap, threshold_value, 255, cv2.THRESH_BINARY)
+
+    sum_image = binary_image.sum(axis=1)
+    y_axis, _ = signal.find_peaks(sum_image)
+
+    # 恰好有三个峰值
+    if len(y_axis) == 3:
+        angle = y_axis.min()
+    elif len(y_axis) > 3:
+        angle = get_3th_top_peaks(y_axis)
+    else:
+        angle = None
+
+    return angle

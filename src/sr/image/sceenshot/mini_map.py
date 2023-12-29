@@ -160,7 +160,8 @@ def analyse_arrow_and_angle(mini_map: MatLike, im: ImageMatcher):
     """
     center_arrow_mask, arrow_mask = get_arrow_mask(mini_map)
     # angle = get_angle_from_arrow(center_arrow_mask, im)  # 正右方向为0度 顺时针旋转为正度数
-    angle = mini_map_angle_alas.calculate(mini_map)
+    # angle = mini_map_angle_alas.calculate(mini_map)
+    angle = mini_map_angle_alas.calculate_angle(mini_map)
     return center_arrow_mask, arrow_mask, angle
 
 
